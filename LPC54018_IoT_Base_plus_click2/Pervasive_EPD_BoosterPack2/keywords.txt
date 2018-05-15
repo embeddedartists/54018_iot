@@ -1,0 +1,27 @@
+#######################################
+# Syntax Coloring Map For PDI_ePaper
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+Pervasive_EPD_BoosterPack2	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	                    KEYWORD2
+EPD_display_GU_from_pointer KEYWORD2
+EPD_display_GU_from_flash   KEYWORD2
+EPD_display_PU_from_pointer KEYWORD2
+EPD_display_PU_from_flash   KEYWORD2
+EPD_Power_off_Ex            KEYWORD2
+end	                        KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+USE_Temperature_Sensor LITERAL1

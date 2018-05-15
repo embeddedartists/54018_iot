@@ -1,0 +1,6 @@
+*.d
+*.o
+*.axf
+*.map
+
+aws_clientcredential_keys.h
