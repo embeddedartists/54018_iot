@@ -230,7 +230,7 @@ static void displayEPD(int tmp_t, int tmp_p, int tmp_h)
     int textStartY = 0;
 
     myScreen->begin();
-    myScreen->setOrientation(1);
+    myScreen->setOrientation(3);
     myScreen->setFontSolid(false);
     myScreen->setFontSize(1);
     

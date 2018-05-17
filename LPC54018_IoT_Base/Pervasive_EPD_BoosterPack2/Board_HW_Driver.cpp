@@ -17,7 +17,7 @@
 #include <stdint.h>
 //#include <Arduino.h>
 #include "Board_HW_Driver.h"
-#include "fsl_spi_freertos.h"
+#include "fsl_spi.h"
 #include "fsl_debug_console.h"
 //#include <SPI.h>
 
@@ -25,10 +25,9 @@
 
 static  volatile uint32_t EPD_Counter;
 //#define CS_H_L_Delay()	delayMicroseconds(10)
-#define CS_H_L_Delay()   vTaskDelay(1 / portTICK_PERIOD_MS)
+#define CS_H_L_Delay()   do { int cntDly = 20; while (--cntDly > 0) {	__NOP(); }} while (0)
 
 static bool spi_initialized = false;
-static spi_rtos_handle_t spi_rtos_handle = {0};
 
 void Board_HW_DriverClass::begin()
 {
@@ -144,7 +143,7 @@ void Board_HW_DriverClass::EPD_spi_attach(void)
     uint32_t srcFreq = EXAMPLE_SPI_MASTER_CLK_FREQ;
     userConfig.sselNum = (spi_ssel_t)EXAMPLE_SPI_SSEL;
     userConfig.sselPol = (spi_spol_t)EXAMPLE_SPI_SPOL;
-    if (SPI_RTOS_Init(&spi_rtos_handle, EXAMPLE_SPI_MASTER, &userConfig, srcFreq) == kStatus_Success) {
+    if (SPI_MasterInit(EXAMPLE_SPI_MASTER, &userConfig, srcFreq) == kStatus_Success) {
 			spi_initialized = true;
 		}
 	}
@@ -163,7 +162,7 @@ void Board_HW_DriverClass::EPD_spi_detach(void)
     SPIMOSI_low();
     SPICLK_low();
 	if (spi_initialized) {
-		SPI_RTOS_Deinit(&spi_rtos_handle);
+		SPI_Deinit(EXAMPLE_SPI_MASTER);
 		spi_initialized = false;
 	}
 }
@@ -176,21 +175,20 @@ uint8_t Board_HW_DriverClass::EPD_spi_read(uint8_t data)
     //return SPI.transfer(data);
 	
 	uint8_t rx = 0;
-	/*spi_transfer_t xfer = {
-		.txData = &data,
-		.rxData = &rx,
-		.dataSize = 1,
-	};*/
-	spi_transfer_t xfer = {0};
-	xfer.txData = &data;
-	xfer.rxData = &rx;
-	xfer.dataSize = 1;
-	SPI_RTOS_Transfer(&spi_rtos_handle, &xfer);
+	SPI_WriteData(EXAMPLE_SPI_MASTER, data, 0);
+	rx = (uint8_t)SPI_ReadData(EXAMPLE_SPI_MASTER);
+	while (!(SPI_GetStatusFlags(EXAMPLE_SPI_MASTER) & SPI_FIFOSTAT_TXEMPTY_MASK))
+	{
+	}
 	return rx;
 }
 void Board_HW_DriverClass::EPD_spi_write(uint8_t data)
 {
-    EPD_spi_read(data);
+    //EPD_spi_read(data);
+	SPI_WriteData(EXAMPLE_SPI_MASTER, data, 1<<22); // 1<<22 is RXIGNORE
+	while (!(SPI_GetStatusFlags(EXAMPLE_SPI_MASTER) & SPI_FIFOSTAT_TXEMPTY_MASK))
+	{
+	}
 }
 
 void Board_HW_DriverClass::iTC_spi_sendReg(uint8_t register_index)

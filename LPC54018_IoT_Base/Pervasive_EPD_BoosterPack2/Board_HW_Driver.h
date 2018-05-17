@@ -122,12 +122,12 @@ public:
     }
     inline static void EPD_cs_high()
     {
-			GPIO_PinWrite(GPIO, 0, 17, 1);
+			//GPIO_PinWrite(GPIO, 0, 17, 1);
         set_gpio_high(EPD_CS_PIN);
     }
     inline static void EPD_cs_low()
     {
-			GPIO_PinWrite(GPIO, 0, 17, 0);
+			//GPIO_PinWrite(GPIO, 0, 17, 0);
         set_gpio_low(EPD_CS_PIN);
     }
 
